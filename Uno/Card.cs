@@ -23,7 +23,7 @@ public class Card
 
 
     public override string ToString()
-    {
+    {    
         return $"{Color} {Number}";
     }
 
