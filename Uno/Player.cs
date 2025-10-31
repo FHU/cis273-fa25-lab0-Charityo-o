@@ -1,10 +1,12 @@
-﻿namespace Uno;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Uno;
+
 public class Player
 {
     public string Name { get; set; } = "";
-
     public List<Card> Hand { get; set; } = new List<Card>();
-
 
     public bool HasPlayableCard(Card card)
     {
@@ -13,43 +15,39 @@ public class Player
 
     public Card GetFirstPlayableCard(Card card)
     {
-        return Hand.FirstOrDefault(c => Card.PlaysOn(c, card));
+        var playableCard = Hand.FirstOrDefault(c => Card.PlaysOn(c, card));
+        return playableCard;
     }
-
 
     public Color MostCommonColor()
     {
-        int redCount = 0;
-        int yellowCount = 0;
-        int blueCount = 0;
-        int greenCount = 0;
-        foreach (Card card in Hand)
+        var colorCount = new Dictionary<Color, int>
         {
-            if (card.Color == Color.Red)
-                redCount++;
-            else if (card.Color == Color.Yellow)
-                yellowCount++;
-            else if (card.Color == Color.Blue)
-                blueCount++;
-            else if (card.Color == Color.Green)
-                greenCount++;
+            { Color.Red, 0 },
+            { Color.Yellow, 0 },
+            { Color.Blue, 0 },
+            { Color.Green, 0 }
+        };
+
+        foreach (var card in Hand)
+        {
+            if (colorCount.ContainsKey(card.Color))
+                colorCount[card.Color]++;
         }
-        if (redCount == 0 && yellowCount == 0 && blueCount == 0 && greenCount == 0)
-            return Color.Wild;
-        int[] counts = { redCount, yellowCount, blueCount, greenCount };
-        Color[] colors = { Color.Red, Color.Yellow, Color.Blue, Color.Green };
 
-        int maxCount = counts[0];
-        Color mostCommon = colors[0];
+        Color[] order = { Color.Red, Color.Yellow, Color.Blue, Color.Green };
+        int max = -1;
+        Color mostCommon = Color.Wild;
 
-        for (int i = 1; i < counts.Length; i++)
+        foreach (var c in order)
         {
-            if (counts[i] > maxCount)
+            if (colorCount[c] > max)
             {
-                maxCount = counts[i];
-                mostCommon = colors[i];
+                max = colorCount[c];
+                mostCommon = c;
             }
         }
+
         return mostCommon;
     }
 }
